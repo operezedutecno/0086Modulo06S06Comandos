@@ -67,12 +67,37 @@ yargs
             const contentString = readFileSync(`${__dirname}/files/personas.txt`,"utf-8")
             const contentJS = JSON.parse(contentString)
 
+            const busqueda = contentJS.some(item => item.rut_dv == rut_dv && item.rut_numero == rut_numero)
+
+            if(busqueda) {
+                return console.log(clc.red("RUT registrado previamente, por favor ingresar los datos de otra persona"));
+            }
+
             contentJS.push(persona)
 
             writeFileSync(`${__dirname}/files/personas.txt`,JSON.stringify(contentJS),"utf-8")
 
             console.log(clc.green("Registro de persona exitoso"));
             
+        }
+    )
+    .command(
+        "listar",
+        "Comando para mostrar la lista de personas registradas",
+        {},
+        () => {
+            const contentString = readFileSync(`${__dirname}/files/personas.txt`,"utf8")
+            const contentJS = JSON.parse(contentString)
+            contentJS.sort((a,b) => a.rut_numero - b.rut_numero)
+            const response = contentJS.map(item => {
+                return {
+                    id: item.id,
+                    rut: `${item.rut_numero}-${item.rut_dv}`,
+                    nombre: item.nombre,
+                    apellido: item.apellido,
+                }
+            })
+            console.table(response);
         }
     )
     .help().argv
